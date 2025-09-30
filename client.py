@@ -7,7 +7,6 @@ client.connect(('127.0.0.1',12345))
 nickname=input("Choose a nickname: ")
 if (client.recv(1024).decode()=="NICK"):
     client.sendall(nickname.encode())
-    print("nickname sent to server")
 
 def recieve():
     while True:
@@ -23,7 +22,6 @@ def write():
      while True:
         message = f'{nickname}: {input("")}'
         client.sendall(message.encode())
-        print("message sent to server")
 
 recieve_thread=threading.Thread(target=recieve)
 recieve_thread.start()
