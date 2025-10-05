@@ -94,12 +94,8 @@ To test the application:
    ```bash
    python client.py
    ```
-5. Test the different chat functionalities:
-   - Send broadcast messages from any client
-   - Send a direct message by typing `dm` and following the prompts
-   - Type `list` to see all connected users
-   - Type `quit` to disconnect a client
-
+5. Test the different chat functionalities using the commands as given in [command section](https://github.com/m4gnet4r/ChatNet?tab=readme-ov-file#commands)
+   
 ## Architecture
 
 - **Server (`server.py`)**: Handles multiple client connections, message broadcasting, and direct messaging
