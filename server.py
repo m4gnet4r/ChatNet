@@ -1,5 +1,6 @@
 import socket
 import threading
+import rsa
 
 host='127.0.0.1'
 port=12345
@@ -12,13 +13,18 @@ print("server is listening...")
 clients=[]
 nicknames=[]
 
+with open('private.pem',"rb") as f:
+    private_key=rsa.PrivateKey.load_pkcs1(f.read())
+with open('public.pem',"rb") as f:
+    public_key=rsa.PublicKey.load_pkcs1(f.read())
+
 
 def broadcast(message):
     for client in clients:
-        client.sendall(message)
+        client.sendall(rsa.encrypt(message,public_key))
 
 def dm(client):
-    str1=(client.recv(1024).decode()).split(': ')
+    str1=(rsa.decrypt(client.recv(1024),private_key).decode()).split(': ')
     list1=(str1[1]).split(',')
     print(list1)
     message=client.recv(1024)
@@ -32,7 +38,7 @@ def handle(client):
         index=clients.index(client)
         nickname=nicknames[index]
         try:
-            message=client.recv(1024)
+            message=rsa.decrypt(client.recv(1024),private_key)
             message1=message.decode()
             if message1 == f'{nickname}: quit' :
                 clients.remove(client)
@@ -41,7 +47,7 @@ def handle(client):
                 broadcast(f'{nickname} has left the chat room.'.encode())
                 break
             elif message1 == f'{nickname}: list':
-                client.sendall(('List of clients: '+', '.join(nicknames)).encode())
+                client.sendall(rsa.encrypt(('List of clients: '+', '.join(nicknames)).encode(),public_key))
             elif message1==f'{nickname}: dm':
                 dm(client)
             else:
@@ -57,8 +63,8 @@ def recieve():
     while True:
         client,address=s.accept()
         print(f'server connected with {address}')
-        client.sendall('NICK'.encode())
-        nickname=client.recv(1024).decode()
+        client.sendall(rsa.encrypt('NICK'.encode(),public_key))
+        nickname=rsa.decrypt(client.recv(1024),private_key).decode()
         clients.append(client)
         nicknames.append(nickname)
 
